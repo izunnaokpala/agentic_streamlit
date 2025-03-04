@@ -123,8 +123,10 @@ with tab2:
 
     ##############################################################################
     # LLM object and API Key
-    os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-    os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
+    # os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+    # os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
+    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+    os.environ["SERPER_API_KEY"] = st.secrets["SERPER_API_KEY"]
     openai_api_key = st.secrets["OPENAI_API_KEY"]
     serper_api_key = st.secrets["SERPER_API_KEY"]
     ##############################################################################
@@ -1075,21 +1077,21 @@ with tab2:
       "exclude_features": exclude_features,
     }
     
-    st.write(f"{directory_path_}")
-    st.write(f"{os.environ["SERPER_API_KEY"]}")
-    st.write(f"{serper_api_key}")
-    df = pd.read_csv(f"https://www.informationstash.com/{directory_path}{test_data}")
-    st.dataframe(df.head())  # Same as st.write(df)
+    # st.write(f"{directory_path_}")
+    # st.write(f"{os.environ["SERPER_API_KEY"]}")
+    # st.write(f"{serper_api_key}")
+    # df = pd.read_csv(f"https://www.informationstash.com/{directory_path}{test_data}")
+    # st.dataframe(df.head())  # Same as st.write(df)
 
 
-    # # Execution
-    # if st.button("Run the Modeling workflow"):
-    #     with st.spinner('Performing machine learning modeling...'):
-    #         result = modeling_crew.kickoff(inputs=modeling_inputs)
-    #         st.write(result)
-    #         docx_file = generate_docx(result)
+    # Execution
+    if st.button("Run the Modeling workflow"):
+        with st.spinner('Performing machine learning modeling...'):
+            result = modeling_crew.kickoff(inputs=modeling_inputs)
+            st.write(result)
+            docx_file = generate_docx(result)
 
-    #         download_link = get_download_link(docx_file, "fraud_modeling_documentation.docx")
+            download_link = get_download_link(docx_file, "fraud_modeling_documentation.docx")
 
-    #         st.markdown(download_link, unsafe_allow_html=True)
+            st.markdown(download_link, unsafe_allow_html=True)
 
