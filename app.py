@@ -394,38 +394,42 @@ with tab2:
 
     def select_best_model(csv_path, target):
 
-      # Load the dataset
-      if csv_path.startswith("fraud_und"): # For fraud undersampled
-        data = pd.read_csv(csv_path)
-      elif csv_path.startswith("c"): # For credit and card approval
-        data = pd.read_csv(csv_path)
+      # # Load the dataset
+      # if csv_path.startswith("fraud_und"): # For fraud undersampled
+      #   data = pd.read_csv(csv_path)
+      # elif csv_path.startswith("c"): # For credit and card approval
+      #   data = pd.read_csv(csv_path)
 
-        # Generate a random seed
-        np.random.seed(42)
+      #   # Generate a random seed
+      #   np.random.seed(42)
 
-        # Calculate the number of rows to select
-        n_rows = int(0.05 * len(data)) # 5% of the dataset
+      #   # Calculate the number of rows to select
+      #   n_rows = int(0.05 * len(data)) # 5% of the dataset
 
-        # Generate a random subset of indices
-        indices = np.random.choice(len(data), n_rows, replace=False)
+      #   # Generate a random subset of indices
+      #   indices = np.random.choice(len(data), n_rows, replace=False)
 
-        # Select the subset of the dataframe
-        data = data.iloc[indices]
-      else:
-        data = pd.read_csv(csv_path)
+      #   # Select the subset of the dataframe
+      #   data = data.iloc[indices]
+      # else:
+      #   data = pd.read_csv(csv_path)
 
-        # Generate a random seed
-        np.random.seed(42)
+      #   # Generate a random seed
+      #   np.random.seed(42)
 
-        # Calculate the number of rows to select
-        n_rows = int(0.005 * len(data)) # 0.5% of the dataset
+      #   # Calculate the number of rows to select
+      #   n_rows = int(0.005 * len(data)) # 0.5% of the dataset
 
-        # Generate a random subset of indices
-        indices = np.random.choice(len(data), n_rows, replace=False)
+      #   # Generate a random subset of indices
+      #   indices = np.random.choice(len(data), n_rows, replace=False)
 
-        # Select the subset of the dataframe
-        data = data.iloc[indices]
-
+      #   # Select the subset of the dataframe
+      #   data = data.iloc[indices]
+      
+      ######################################
+      # Added for online experiment
+      data = pd.read_csv(csv_path)
+      ######################################
       X = data.drop(target, axis=1)
       y = data[target]
 
