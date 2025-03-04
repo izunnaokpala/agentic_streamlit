@@ -89,7 +89,7 @@ with tab2:
     import os
     from crewai_tools import tool
     from crewai_tools import ScrapeWebsiteTool, SerperDevTool
-    from dotenv import load_dotenv
+    #from dotenv import load_dotenv
     from langchain_openai import ChatOpenAI
     from docx import Document
     from io import BytesIO
@@ -117,7 +117,7 @@ with tab2:
 
     ##############################################################################
     # Load Environment Variables
-    load_dotenv()
+    #load_dotenv()
     ##############################################################################
 
 
@@ -125,6 +125,8 @@ with tab2:
     # LLM object and API Key
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
     os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
+    openai_api_key = st.secrets["OPENAI_API_KEY"]
+    serper_api_key = st.secrets["SERPER_API_KEY"]
     ##############################################################################
 
     ##############################################################################
@@ -654,6 +656,7 @@ with tab2:
 
 
     directory_path= dir_path
+    directory_path_ = '/tmp/'
     model_name= "model.joblib"
     train_data2= "train2.csv"
     test_data2= "test2.csv"
@@ -739,7 +742,8 @@ with tab2:
     eda_agent = LoggingAgent(
         role="Senior Data Scientist I",
         goal=(
-            f"Conduct a detailed Exploratory data analysis on the provided dataset located at '{directory_path}{csv_name}'. "
+            #f"Conduct a detailed Exploratory data analysis on the provided dataset located at '{directory_path}{csv_name}'. "
+            f"Conduct a detailed Exploratory data analysis on the provided dataset located at 'https://www.informationstash.com/{directory_path}{train_data}'. "
             "The Final Answer should be a detailed EDA report with title and subtitles "
             ),
         backstory=(
@@ -759,7 +763,8 @@ with tab2:
     feature_engineer = LoggingAgent(
         role="Senior Data Scientist II",
         goal=(
-            f"Preprocess the test and train dataset located on '{directory_path}{test_data}' and '{directory_path}{train_data}' respectively.\n"
+            #f"Preprocess the test and train dataset located on '{directory_path}{test_data}' and '{directory_path}{train_data}' respectively.\n"
+            f"Preprocess the test and train dataset located on 'https://www.informationstash.com/{directory_path}{test_data}' and 'https://www.informationstash.com/{directory_path}{train_data}' respectively.\n"
             "To be effective in performing feature engineering, "
             "kindly follow the procedure below and handle the test and train data seperately:\n"
             "Feature Engineering on both test and train dataset:\n"
@@ -768,7 +773,7 @@ with tab2:
             # "  3) Use K-Nearest Neighbors (KNN) imputation to fill missing values on the train and test dataset with fit_transform and transform methods respectively. \n"
             f"  2) Check the unique values in the target variable named {target} for the test and train dataset separatley to determine if the proportion of any of the classes is equal to or greater than 60%'. "
             " if their is class imbalance on any(test or train dataset), perform random undersampling(random state = 42) on the test and train dataset seperately using fit_resample method. \n"
-            f"  3) Save the new transformed test and train data in the directory '{directory_path}' as '{test_data2}' and '{train_data2}' respectively.\n"
+            f"  3) Save the new transformed test and train data in the directory '{directory_path_}' as '{test_data2}' and '{train_data2}' respectively.\n"
             "Additionally, include the following in the generated code:\n"
             "  1. Create a variable 'result' with the first 3 rows of the transformed train data.\n"
             "The Final Answer MUST be a report with Title and subtitles showing all the types of transformation performed on the dataset and the location of the transformed data."
@@ -788,7 +793,7 @@ with tab2:
     model_selection_agent = LoggingAgent(
         role="Machine Learning Engineer I",
         goal=(
-            f"Select the best machine learning model using the GridSearchCV method on the dataset located at '{directory_path}{train_data2}'. "
+            f"Select the best machine learning model using the GridSearchCV method on the dataset located at '{directory_path_}{train_data2}'. "
             f"The target variable is named '{target}'.\n"
             "Give the rationale for the selected model."
             ),
@@ -809,7 +814,7 @@ with tab2:
         goal=(
             "Tune only the hyperparameters of the selected "
             "model from the model selection agent. "
-            f"Use only 40% of the dataset located at '{directory_path}{train_data2}' for this exercise. "
+            f"Use only 40% of the dataset located at '{directory_path_}{train_data2}' for this exercise. "
             "To be effective in choosing the parameters and values, "
             "kindly use the parameter for tuning the selected model below:\n"
             "    If Logistic Regression was selected, use 'C': [0.01, 0.1, 1, 10, 100], 'solver': ['lbfgs', 'liblinear']\n"
@@ -823,7 +828,7 @@ with tab2:
             f"The target feature is named '{target}'. "
             "The random state and/or seed should be set to 42. \n"
             "The variable name for the best parameters must be called 'result' \n"
-            f"Save the result as a txt file with the name '{params}' in the directory '{directory_path}'."
+            f"Save the result as a txt file with the name '{params}' in the directory '{directory_path_}'."
             ),
         backstory=(
             "You are a 'Machine Learning Engineer - Hyperparameter Tuning' with expertise in conducting hyperparameter tuning."
@@ -843,14 +848,14 @@ with tab2:
             "Train the selected model from the model selection agent.\n\n"
             # "Train the selected model from the model selection agent and NOT Random Forest.\n\n"
             "DATA:\n"
-            f"* The train and test datasets are located at '{directory_path}{train_data2}' and '{directory_path}{test_data2}' respectively.\n"
+            f"* The train and test datasets are located at '{directory_path_}{train_data2}' and '{directory_path_}{test_data2}' respectively.\n"
             f"* The target variable is named '{target}'.\n"
             "HYPERPARAMETERS:\n"
             "* Please make sure to use the best hyperparameters to train the selected model.\n"
             "TRAINING:\n"
             "* Train the selected machine learning model using the train dataset and the best hyperparameters.\n"
             "SAVING:\n"
-            f"* Save the trained model in the directory '{directory_path}' as '{model_name}'.\n"
+            f"* Save the trained model in the directory '{directory_path_}' as '{model_name}'.\n"
             "* Create a dictionary variable called 'result' that contains the location of the saved model.\n\n"
             "IMPORTING joblib:\n"
             "* To import joblib, use 'import joblib'.\n\n"
@@ -875,8 +880,8 @@ with tab2:
     evaluation_agent = LoggingAgent(
         role="Senior Machine Learning Engineer III",
         goal=(
-            f"Evaluate the performance of the model located at '{directory_path}{model_name}' "
-            f"The test data for this evaluation is located at '{directory_path}{test_data2}'. "
+            f"Evaluate the performance of the model located at '{directory_path_}{model_name}' "
+            f"The test data for this evaluation is located at '{directory_path_}{test_data2}'. "
             f"The target variable is '{target}'. "
             "Within the generated code, a dict variable called 'result' should be created. "
             "The result variable should contain all the performance metrics accuracy, F1-score, recall, precision, and auc. "
@@ -899,7 +904,8 @@ with tab2:
 
     eda_task = LoggingTask(
         description=(
-            f"Conduct a detailed Exploratory data analysis on the provided dataset located at '{directory_path}{csv_name}'."
+            #f"Conduct a detailed Exploratory data analysis on the provided dataset located at '{directory_path}{csv_name}'."
+            f"Conduct a detailed Exploratory data analysis on the provided dataset located at 'https://www.informationstash.com/{directory_path}{csv_name}'."
             # "The report should show the shape of the dataset, missing values, the descriptive statistics "
             # "of the numeric features, correlation across features, feature skewness and data distribution.\n"
             # "Do not generating visual representations such as correlation matrices or histograms displaying data distributions, "
@@ -922,7 +928,8 @@ with tab2:
 
     feature_task = LoggingTask(
         description=(
-            f"Preprocess the test and train dataset located on '{directory_path}{test_data}' and '{directory_path}{train_data}' respectively.\n"
+            #f"Preprocess the test and train dataset located on '{directory_path}{test_data}' and '{directory_path}{train_data}' respectively.\n"
+            f"Preprocess the test and train dataset located on 'https://www.informationstash.com/{directory_path}{test_data}' and 'https://www.informationstash.com/{directory_path}{train_data}' respectively.\n"
             # "To be effective in performing feature engineering, "
             # "kindly follow the procedure below and handle the test and train data seperately:\n"
             # "Feature Engineering on both test and train dataset:\n"
@@ -946,7 +953,7 @@ with tab2:
 
     model_selection_task = LoggingTask(
         description=(
-            f"Select the best machine learning model using the GridSearchCV method on the dataset located at '{directory_path}{train_data2}'. "
+            f"Select the best machine learning model using the GridSearchCV method on the dataset located at '{directory_path_}{train_data2}'. "
             # f"The target variable is named '{target}'.\n"
             # "Give the rationale for the selected model."
                     ),
@@ -981,7 +988,7 @@ with tab2:
             # f"The target feature is named '{target}'. "
             # "The random state and/or seed should be set to 42. \n"
             # "The variable name for the best parameters must be called 'result'. \n"
-            f"Save the result as a txt file with the name '{params}' in the directory '{directory_path}'."
+            f"Save the result as a txt file with the name '{params}' in the directory '{directory_path_}'."
             ),
         expected_output=(
             "A detailed Hyperparameter Tuning report with title, subtitles showing "
@@ -997,7 +1004,7 @@ with tab2:
         description=(
             "Train the selected model from the model selection agent.\n\n"
             "DATA:\n"
-            f"* The train and test datasets are located at '{directory_path}{train_data2}' and '{directory_path}{test_data2}' respectively.\n\n"
+            f"* The train and test datasets are located at '{directory_path_}{train_data2}' and '{directory_path_}{test_data2}' respectively.\n\n"
             # f"* The target variable is named '{target}'.\n"
             # "HYPERPARAMETERS:\n"
             # "* Please make sure to use the best hyperparameters to train the selected model.\n"
@@ -1023,8 +1030,8 @@ with tab2:
 
     evaluation_task = LoggingTask(
         description=(
-            f"Evaluate the performance of the model located at '{directory_path}{model_name}' "
-            f"The test data for this evaluation is located at '{directory_path}{test_data2}'. \n"
+            f"Evaluate the performance of the model located at '{directory_path_}{model_name}' "
+            f"The test data for this evaluation is located at '{directory_path_}{test_data2}'. \n"
             # f"The target variable is '{target}'. "
             # "Within the generated code, a dict variable called 'result' should be created. "
             # "The result variable should contain all the performance metrics accuracy, F1-score, recall, precision, top capture rate and auc. "
@@ -1067,16 +1074,22 @@ with tab2:
       "target": target,
       "exclude_features": exclude_features,
     }
+    
+    st.write(f"{directory_path_}"):
+    st.write(f"{os.environ["SERPER_API_KEY"]}"):
+    st.write(f"{serper_api_key}"):
+    df = pd.read_csv(f"https://www.informationstash.com/{directory_path}{test_data}")
+    st.dataframe(df.head())  # Same as st.write(df)
 
 
-    # Execution
-    if st.button("Run the Modeling workflow"):
-        with st.spinner('Performing machine learning modeling...'):
-            result = modeling_crew.kickoff(inputs=modeling_inputs)
-            st.write(result)
-            docx_file = generate_docx(result)
+    # # Execution
+    # if st.button("Run the Modeling workflow"):
+    #     with st.spinner('Performing machine learning modeling...'):
+    #         result = modeling_crew.kickoff(inputs=modeling_inputs)
+    #         st.write(result)
+    #         docx_file = generate_docx(result)
 
-            download_link = get_download_link(docx_file, "fraud_modeling_documentation.docx")
+    #         download_link = get_download_link(docx_file, "fraud_modeling_documentation.docx")
 
-            st.markdown(download_link, unsafe_allow_html=True)
+    #         st.markdown(download_link, unsafe_allow_html=True)
 
