@@ -1,5 +1,6 @@
 # Define the algorithm as a string with Markdown formatting
 import os
+import json
 import streamlit as st
 
 st.set_page_config(
@@ -313,7 +314,8 @@ with tab2:
             str: The output of the executed code.
         """
         # Execute the generated code
-        output = execute_generated_code(generated_code)
+        best_ = "\nif 'best_params' in locals():\n    result = best_params"
+        output = execute_generated_code(generated_code+best_)
 
         return output
     ##############################################################################
@@ -552,18 +554,21 @@ with tab2:
             results = []
             for task in self.tasks:
                 # print(f"\n🟢 Running Task: {task.description}")
-                log(f"🟢 Running Task: {task.description}")
+                log(
+                    "### 🟢 Running New Task: \n"
+                    f"{task.description}"
+                    )
                 # print(f"👤 Agent: {task.agent.role}")
-                log(f"👤 Agent: {task.agent.role}")
+                log(f"### 👤 Agent: {task.agent.role}")
 
                 # Execute the task with agent and input
                 result = task.execute()  # Removed the 'inputs' argument here
 
                 # print(f"✅ Task Completed: {task.description}")
                 # log(f"✅ Task Completed: {task.description}")
-                log(f"✅ Task Completed")
+                log(f"### ✅ Task Completed")
                 # print(f"📄 Output: {result}\n")
-                log(f"📄 Output: {result}")
+                log(f"### 📄 Output: {result}")
 
                 results.append(result)
             # print("\n✅ Crew Execution Completed!\n")
@@ -650,6 +655,7 @@ with tab2:
 
 
     # Text Inputs
+    dir_path_ = st.text_input("Enter data source domain name", "informationstash")
     dir_path = st.text_input("Enter project directory", "e.g., fraud/")
     # dir_path = st.text_input("Enter project directory", "fraud_und/")
     csv_name = st.text_input("Enter dataset name", "e.g., fraud.csv")
@@ -749,7 +755,7 @@ with tab2:
         role="Senior Data Scientist I",
         goal=(
             #f"Conduct a detailed Exploratory data analysis on the provided dataset located at '{directory_path}{csv_name}'. "
-            f"Conduct a detailed Exploratory data analysis on the provided dataset located at 'https://www.informationstash.com/{directory_path}{train_data}'. "
+            f"Conduct a detailed Exploratory data analysis on the provided dataset located at 'https://www.{dir_path_}.com/{directory_path}{train_data}'. "
             "The Final Answer should be a detailed EDA report with title and subtitles "
             ),
         backstory=(
@@ -770,7 +776,7 @@ with tab2:
         role="Senior Data Scientist II",
         goal=(
             #f"Preprocess the test and train dataset located on '{directory_path}{test_data}' and '{directory_path}{train_data}' respectively.\n"
-            f"Preprocess the test and train dataset located on 'https://www.informationstash.com/{directory_path}{test_data}' and 'https://www.informationstash.com/{directory_path}{train_data}' respectively.\n"
+            f"Preprocess the test and train dataset located on 'https://www.{dir_path_}.com/{directory_path}{test_data}' and 'https://www.{dir_path_}.com/{directory_path}{train_data}' respectively.\n"
             "To be effective in performing feature engineering, "
             "kindly follow the procedure below and handle the test and train data seperately:\n"
             "Feature Engineering on both test and train dataset:\n"
@@ -823,7 +829,7 @@ with tab2:
             f"Use only 40% of the dataset located at '{directory_path_}{train_data2}' for this exercise. "
             "To be effective in choosing the parameters and values, "
             "kindly use the parameter for tuning the selected model below:\n"
-            "    If Logistic Regression was selected, use 'C': [0.01, 0.1, 1, 10, 100], 'solver': ['lbfgs', 'liblinear']\n"
+            "    If Logistic Regression was selected, set max_iter as 1000 and use 'C': [0.01, 0.1, 1, 10, 100], 'solver': ['lbfgs', 'liblinear']\n"
             "    If Decision Trees was selected, use  'max_depth': [1, 5, 10, 20], 'min_samples_split': [2, 5, 10]\n"
             "    If Support Vector Machine was selected, use  'C': [0.1, 1, 10], 'gamma': ['scale', 'auto']\n"
             "    If Random Forest was selected, use  'n_estimators': [50, 100, 200, 300], 'max_depth': [None, 1, 5, 10, 20]\n"
@@ -831,10 +837,10 @@ with tab2:
             "    If CatBoost was selected, use 'verbose':0, 'iterations': [100, 200], 'learning_rate': [0.01, 0.1], 'depth': [3, 5]\n"
             "    If Gradient Boosting was selected, use  'n_estimators': [100, 200], 'learning_rate': [0.01, 0.1], 'max_depth': [3, 5]\n"
             "    If Ada Boost was selected, use  'n_estimators': [50, 100], 'learning_rate': [0.01, 0.1]\n"
-            f"The target feature is named '{target}'. "
-            "The random state and/or seed should be set to 42. \n"
-            "The variable name for the best parameters must be called 'result' \n"
-            f"Save the result as a txt file with the name '{params}' in the directory '{directory_path_}'."
+            f"The target feature is named '{target}', and the "
+            "random state and/or seed should be set to 42. \n"
+            f"Save the best hyperparameters as a txt file with the name '{params}' in the directory '{directory_path_}' and create a 'result' variable name to store the best parameters. \n"
+            # "Create a new string variable named 'result' at the end to store the best hyperparameters. "
             ),
         backstory=(
             "You are a 'Machine Learning Engineer - Hyperparameter Tuning' with expertise in conducting hyperparameter tuning."
@@ -911,7 +917,7 @@ with tab2:
     eda_task = LoggingTask(
         description=(
             #f"Conduct a detailed Exploratory data analysis on the provided dataset located at '{directory_path}{csv_name}'."
-            f"Conduct a detailed Exploratory data analysis on the provided dataset located at 'https://www.informationstash.com/{directory_path}{csv_name}'."
+            f"Conduct a detailed Exploratory data analysis on the provided dataset located at 'https://www.{dir_path_}.com/{directory_path}{train_data}'."
             # "The report should show the shape of the dataset, missing values, the descriptive statistics "
             # "of the numeric features, correlation across features, feature skewness and data distribution.\n"
             # "Do not generating visual representations such as correlation matrices or histograms displaying data distributions, "
@@ -935,7 +941,7 @@ with tab2:
     feature_task = LoggingTask(
         description=(
             #f"Preprocess the test and train dataset located on '{directory_path}{test_data}' and '{directory_path}{train_data}' respectively.\n"
-            f"Preprocess the test and train dataset located on 'https://www.informationstash.com/{directory_path}{test_data}' and 'https://www.informationstash.com/{directory_path}{train_data}' respectively.\n"
+            f"Preprocess the test and train dataset located on 'https://www.{dir_path_}.com/{directory_path}{test_data}' and 'https://www.{dir_path_}.com/{directory_path}{train_data}' respectively.\n"
             # "To be effective in performing feature engineering, "
             # "kindly follow the procedure below and handle the test and train data seperately:\n"
             # "Feature Engineering on both test and train dataset:\n"
@@ -983,7 +989,7 @@ with tab2:
             # f"Use only 40% of the dataset located at '{directory_path}{train_data2}' for this exercise. "
             # "To be effective in choosing the parameters and values, "
             # "kindly use the parameter for tuning the selected model below:\n"
-            "    If Logistic Regression was selected, use 'C': [0.01, 0.1, 1, 10, 100], 'solver': ['lbfgs', 'liblinear']\n"
+            # "    If Logistic Regression was selected, use 'C': [0.01, 0.1, 1, 10, 100], 'solver': ['lbfgs', 'liblinear']\n"
             # "    If Decision Trees was selected, use  'max_depth': [1, 5, 10, 20], 'min_samples_split': [2, 5, 10]\n"
             # "    If Support Vector Machine was selected, use  'C': [0.1, 1, 10], 'gamma': ['scale', 'auto']\n"
             # "    If Random Forest was selected, use  'n_estimators': [50, 100, 200, 300], 'max_depth': [None, 1, 5, 10, 20]\n"
@@ -993,8 +999,9 @@ with tab2:
             # "    If Ada Boost was selected, use  'n_estimators': [50, 100], 'learning_rate': [0.01, 0.1]\n"
             # f"The target feature is named '{target}'. "
             # "The random state and/or seed should be set to 42. \n"
-            # "The variable name for the best parameters must be called 'result'. \n"
-            f"Save the result as a txt file with the name '{params}' in the directory '{directory_path_}'."
+            # "The variable name for the best parameters should be called 'result'. \n"
+            f"Save the best hyperparameters as a txt file with the name '{params}' in the directory '{directory_path_}' and create a 'result' variable name to store the best parameters. \n"
+            # f"Save the result as a txt file with the name '{params}' in the directory '{directory_path_}'."
             ),
         expected_output=(
             "A detailed Hyperparameter Tuning report with title, subtitles showing "
@@ -1084,7 +1091,7 @@ with tab2:
     # st.write(f"{directory_path_}")
     # st.write(f"{os.environ["SERPER_API_KEY"]}")
     # st.write(f"{serper_api_key}")
-    # df = pd.read_csv(f"https://www.informationstash.com/{directory_path}{test_data}")
+    # df = pd.read_csv(f"https://www.{dir_path_}.com/{directory_path}{test_data}")
     # st.dataframe(df.head())  # Same as st.write(df)
 
 
@@ -1098,4 +1105,3 @@ with tab2:
             download_link = get_download_link(docx_file, "fraud_modeling_documentation.docx")
 
             st.markdown(download_link, unsafe_allow_html=True)
-
