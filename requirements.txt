@@ -7,16 +7,12 @@ seaborn
 python-docx
 pypdf
 re
+scikit-learn
+xgboost
+catboost
+serperdevtool
 
 # Machine Learning libraries
-scikit-learn==1.3.0
-xgboost==1.7.6
-catboost
 crewai==0.55.2
 crewai_tools==0.12.0
 langchain_ollama==0.1.3
-
-# OpenAI & LangChain tools
-langchain_openai
-crew_ai_tools
-serperdevtool
