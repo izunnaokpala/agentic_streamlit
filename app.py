@@ -1075,9 +1075,9 @@ with tab2:
       "exclude_features": exclude_features,
     }
     
-    st.write(f"{directory_path_}"):
-    st.write(f"{os.environ["SERPER_API_KEY"]}"):
-    st.write(f"{serper_api_key}"):
+    st.write(f"{directory_path_}")
+    st.write(f"{os.environ["SERPER_API_KEY"]}")
+    st.write(f"{serper_api_key}")
     df = pd.read_csv(f"https://www.informationstash.com/{directory_path}{test_data}")
     st.dataframe(df.head())  # Same as st.write(df)
 
